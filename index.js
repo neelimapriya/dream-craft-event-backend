@@ -2,7 +2,7 @@ import http from "http";
 import app from './src/app.js';
 import connectDB from "./src/db/connectDB.js";
 import 'dotenv/config'
-
+dotenv.config();
 const server = http.createServer(app);
 const port = process.env.PORT || 8080;
 

@@ -3,24 +3,27 @@ import Transaction from "../../../models/Transaction.js";
 import { Types } from "mongoose";
 import 'dotenv/config'
 
-const store_id = 'datad65ceef48f39dc'
-const store_passwd = 'datad65ceef48f39dc@ssl'
+const store_id =process.env.Store_ID
+const store_passwd =process.env.Store_Password
 const is_live = false
 
 const payment = async (req, res) => {
 
     const order = req.body
-    // const tran_id = Types.ObjectId()
-    // console.log(tran_id);
+    const tran_id = new Types.ObjectId().toHexString()
 
     const data = {
         event_id: order.eventId,
+        event_image: order.eventImage,
+        event_date: order.eventDate,
         total_amount: order.amount,
         currency: order.currency,
-        tran_id: 'tran_id',
-        success_url: `http://localhost:5173/payment/success`,
-        fail_url: 'http://localhost:3030/fail',
-        cancel_url: 'http://localhost:3030/cancel',
+        tran_id: tran_id,
+        success_url: `https://dream-craft-server.vercel.app/payment/success/${tran_id}`,
+        // success_url: `http://localhost:8080/payment/success/${tran_id}`,
+        fail_url: `https://dream-craft-server.vercel.app/payment/fail/${tran_id}`,
+        cancel_url: 'https://dream-craft-events.vercel.app/',
+
         ipn_url: 'http://localhost:3030/ipn',
         shipping_method: 'Courier',
         product_name: 'Computer.',
@@ -43,31 +46,35 @@ const payment = async (req, res) => {
         ship_state: 'Dhaka',
         ship_postcode: 1000,
         ship_country: 'Bangladesh',
+        eventTitle: order.eventTitle,
     };
 
     try {
         const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live);
         const apiResponse = await sslcz.init(data);
 
+        // Redirect the user to the payment gateway
+        res.send({ url: apiResponse.GatewayPageURL });
+
         // Save payment details to the database
         const payment = new Transaction({
             event_id: data.event_id,
+            eventImage: data.event_image,
+            eventTitle: data.eventTitle,
+            eventDate: data.event_date,
             total_amount: data.total_amount,
             currency: data.currency,
             tran_id: data.tran_id,
-            success_url: data.success_url,
-            fail_url: data.fail_url,
-            cancel_url: data.cancel_url,
-            ipn_url: data.ipn_url,
             cus_name: data.cus_name,
             cus_email: data.cus_email,
             cus_address: data.cus_add1,
+            paidStatus: false
         });
+
         await payment.save();
 
-        // Redirect the user to the payment gateway
-        res.send({ url: apiResponse.GatewayPageURL });
-        console.log('Redirecting to:', apiResponse);
+        // console.log('Redirecting to:', apiResponse);
+
     } catch (error) {
         console.error('Error initializing payment:', error);
         res.status(500).send('Error initializing payment');

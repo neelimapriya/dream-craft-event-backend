@@ -1,18 +1,18 @@
-import { Schema, model } from "mongoose";
+import { Schema, Types, model } from "mongoose";
 
 const transactionSchema = new Schema(
     {
         event_id: String,
+        eventImage: String,
+        eventTitle: String,
+        eventDate: Date,
         total_amount: Number,
         currency: String,
-        tran_id: String,
-        success_url: String,
-        fail_url: String,
-        cancel_url: String,
-        ipn_url: String,
+        'tran_id': { type: String, require: true },
         cus_name: String,
         cus_email: String,
         cus_address: String,
+        paidStatus: { type: Boolean, default: false }
     },
     { versionKey: false }
 );
