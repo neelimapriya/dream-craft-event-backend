@@ -3,8 +3,8 @@ import Transaction from "../../../models/Transaction.js";
 import { Types } from "mongoose";
 import 'dotenv/config'
 
-const store_id = 'datad65ceef48f39dc'
-const store_passwd = 'datad65ceef48f39dc@ssl'
+const store_id =process.env.Store_ID
+const store_passwd =process.env.Store_Password
 const is_live = false
 
 const payment = async (req, res) => {
@@ -22,7 +22,7 @@ const payment = async (req, res) => {
         success_url: `https://dream-craft-server.vercel.app/payment/success/${tran_id}`,
         // success_url: `http://localhost:8080/payment/success/${tran_id}`,
         fail_url: `https://dream-craft-server.vercel.app/payment/fail/${tran_id}`,
-        cancel_url: 'https://dream-craft-event.web.app/',
+        cancel_url: 'https://dream-craft-events.vercel.app/',
 
         ipn_url: 'http://localhost:3030/ipn',
         shipping_method: 'Courier',
